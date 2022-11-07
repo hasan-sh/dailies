@@ -15,6 +15,21 @@ a {
   box-sizing: border-box;
 }
 
+.btn {
+  border: none;
+  text-decoration: none;
+  padding: 15px 30px;
+  font-size: 1.2em;
+  line-height: 1.5em;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn.pink {
+  background: #F40365;
+  color: white;
+}
+
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
