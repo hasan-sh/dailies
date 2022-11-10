@@ -2,6 +2,7 @@
 import { collection, DocumentData, Firestore, getDocs, QuerySnapshot, query, orderBy, where, Timestamp, doc, collectionGroup, QueryDocumentSnapshot  } from 'firebase/firestore/lite';
 import Link from 'next/link';
 import { ChangeEvent, useContext, useEffect, useReducer, useState } from 'react';
+import { motion, AnimateSharedLayout } from "framer-motion"
 
 // import UserContext from '../userContext'
 import { db } from '../../firebase';
@@ -25,7 +26,7 @@ export default function Dailies({ date, user }: DailiesProps) {
   }
 
 
-  const {dailies: staticDailies, getDailies } = useContext(DailiesContext)
+  const { dailies: staticDailies, getDailies } = useContext(DailiesContext)
 
   const [dailies, setDailies] = useState<QueryDocumentSnapshot<DocumentData>[]>()
   const [firstRun, setFirstRun] = useState(true)
@@ -64,22 +65,38 @@ export default function Dailies({ date, user }: DailiesProps) {
           <Loader />
         </div>
       )}
-      {dailies?.map((doc: DocumentData) => {
-        const daily = doc.data()
-        const createdAt = new Date(daily.createdAt.seconds * 1000)
-        return (
-          <Link href={{
-            pathname: `/dailies/${doc.id}`,
-            query: { ...daily, createdAt: createdAt.toDateString() },
-          }}
-            as={`/dailies/${doc.id}`}
 
-            key={doc.id} className={styles.card}>
-            <h2>{createdAt.toDateString()} &rarr;</h2>
-            <p>{daily.text}</p>
-          </Link>
-        )
-      })}
+      <AnimateSharedLayout>
+        <motion.ul layout className={styles.grid}>
+          {dailies?.map((doc: DocumentData) => {
+            const daily = doc.data()
+            const createdAt = new Date(daily.createdAt.seconds * 1000)
+            return <motion.div
+              layout
+              layoutId={doc.id}
+              key={doc.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{
+                staggerChildren: 1
+              }}
+              className={styles.card}>
+              <Link
+                href={{
+                  pathname: `/dailies/${doc.id}`,
+                  query: { ...daily, createdAt: createdAt.toDateString() },
+                }}
+                as={`/dailies/${doc.id}`}
+                key={doc.id}
+                >
+
+                <h2>{createdAt.toDateString()} &rarr; &rarr;</h2>
+                <p>{daily.text}</p>
+              </Link>
+            </motion.div>
+          })}
+        </motion.ul>
+      </AnimateSharedLayout>
       <Link href={{
         pathname: '/dailies/create',
         query: { uid: user.uid }
@@ -89,7 +106,7 @@ export default function Dailies({ date, user }: DailiesProps) {
           borderColor: '#0070f3',
           color: '#0070f3',
         }}>
-        <h2 style={{margin: 0}}>Create Daily &rarr;</h2>
+        <h2 style={{ margin: 0 }}>Create Daily &rarr;</h2>
       </Link>
     </div>
   )
