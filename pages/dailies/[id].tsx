@@ -9,6 +9,8 @@ import styles from './dailies.module.css'
 import { db } from '../../firebase';
 import { collection, doc, getDoc, query, setDoc, Timestamp, where } from 'firebase/firestore/lite';
 import Link from 'next/link';
+import useWindowSize from '../../components/useWindow';
+import Loader from '../../components/loader';
 
 
 
@@ -19,16 +21,17 @@ const MarkdownEditor = dynamic(
 
 const Daily = () => {
     const router = useRouter()
-    let { id, text, createdAt: time } = router.query
-    text = typeof text === "object" ? text.toString() : text
-    id = typeof id === "object" ? id.toString() : id
-
-    const [markdown, setMarkdown] = useState(text || '')
+    const { id, text, createdAt: time } = router.query
+    const [markdown, setMarkdown] = useState(text?.toString() || '')
     const [createdAt, setCreatedAt] = useState(time)
+    const [loading, setLoading] = useState(true)
+    const windowSize = useWindowSize()
 
 
     useEffect(() => {
         async function init() {
+            if (!id)
+                return
             const daily = await getDaily(id)
             const data = daily.data()
             if (data) {
@@ -39,11 +42,10 @@ const Daily = () => {
                 router.push('/dailies')
             }
         }
-        if (id && !markdown) {
-            init()
-        }
+        init()
 
-    }, [markdown, id])
+    }, [id])
+
     return (
         <div className={styles.container}>
             <div className={styles.createdAt}>
@@ -56,14 +58,17 @@ const Daily = () => {
                     }}>Update</button>
                 <Link href='/'>Home</Link>
             </div>
+            {loading && <Loader />}
             <MarkdownEditor
                 value={markdown}
                 onChange={value => setMarkdown(value)}
-                height="100px"
+                height="100%"
                 className={styles.mdContainer}
+                visible={windowSize.width > 600}
+                // arguments are informative
+                onCreateEditor={() => setLoading(false)}
                 autoFocus
                 editable
-                visible 
             />
         </div>
     )

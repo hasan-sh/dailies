@@ -40,3 +40,8 @@ next-env.d.ts
 firebase.*
 /.firebase/
 .firebaserc
+
+
+# PWA
+**/public/precache.*.js
+**/public/sw.js

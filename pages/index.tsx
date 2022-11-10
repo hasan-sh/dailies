@@ -14,6 +14,7 @@ import styles from '../styles/Home.module.css'
 import Dailies from './dailies';
 import Login from '../components/login';
 import { DateContext } from '../store/date';
+import Splash from '../components/splash';
 
 
 interface HomeProps {
@@ -45,9 +46,11 @@ export default observer(function Home(props: HomeProps) {
         </Head>
 
         <main className={styles.main}>
-          <h1 className={styles.title}>
+          <Splash /> 
+          {/* <h1 className={styles.title}>
+            <Splash /> 
             Welcome to <span className={styles.name}>Dailies!</span>
-          </h1>
+          </h1> */}
 
           {user ? (
             <>

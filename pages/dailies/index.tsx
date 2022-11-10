@@ -7,10 +7,12 @@ import { ChangeEvent, useContext, useEffect, useReducer, useState } from 'react'
 import { db } from '../../firebase';
 import styles from './dailies.module.css'
 import { User } from 'firebase/auth';
+import Loader from '../../components/loader';
+import { DailiesContext } from '../../store/dailies';
 
 
 interface DailiesProps {
-    date: Date | undefined
+    date: Date 
     user: User
 }
 
@@ -19,18 +21,20 @@ export default function Dailies({ date, user }: DailiesProps) {
 
   if (!date) {
     date = new Date()
+    date.setHours(0, 0, 0, 0);
   }
 
 
-  const [staticDailies, setStaticDailies] = useState<QueryDocumentSnapshot<DocumentData>[]>()
+  const {dailies: staticDailies, getDailies } = useContext(DailiesContext)
+
   const [dailies, setDailies] = useState<QueryDocumentSnapshot<DocumentData>[]>()
   const [firstRun, setFirstRun] = useState(true)
 
   useEffect(() => {
     async function init() {
       const newDailies = await getDailies(db, user.uid)
-      setStaticDailies(newDailies)
-      setDailies(newDailies)
+      const filteredDailies = filterByDate(newDailies, date)
+      setDailies(filteredDailies)
     }
 
     init()
@@ -55,6 +59,11 @@ export default function Dailies({ date, user }: DailiesProps) {
 
   return (
     <div className={styles.grid}>
+      {!dailies?.length && firstRun && (
+        <div className={styles.card}>
+          <Loader />
+        </div>
+      )}
       {dailies?.map((doc: DocumentData) => {
         const daily = doc.data()
         const createdAt = new Date(daily.createdAt.seconds * 1000)
@@ -77,29 +86,24 @@ export default function Dailies({ date, user }: DailiesProps) {
       }}
         as='/dailies/create'
         className={styles.card} style={{
-          borderColor: 'red',
-          color: 'red',
+          borderColor: '#0070f3',
+          color: '#0070f3',
         }}>
-        <h2>Create Daily &rarr;</h2>
-        <p>Create your daily now!</p>
+        <h2 style={{margin: 0}}>Create Daily &rarr;</h2>
       </Link>
     </div>
   )
 }
 
-async function getDailies(db: Firestore, userId: string) {
-  try {
-    const colRef = collection(db, 'dailies');
-    // const docRef = getDocs(colRef, userId)
-    const q = query(colRef, where('uid', '==', userId))//orderBy('createdAt', 'asc'))
-    const dailySnapshot = await getDocs(q);
-    
-    const docs = sortByDate(dailySnapshot.docs)
-    return docs;
-  } catch (error) {
-    console.log(error) 
-  }
-}
+// async function getDailies(db: Firestore, userId: string) {
+//   const colRef = collection(db, 'dailies');
+//   // const docRef = getDocs(colRef, userId)
+//   const q = query(colRef, where('uid', '==', userId))//orderBy('createdAt', 'asc'))
+//   const dailySnapshot = await getDocs(q);
+  
+//   const docs = sortByDate(dailySnapshot.docs)
+//   return docs;
+// }
 
 function filterByDate(docs: QueryDocumentSnapshot<DocumentData>[], date: Date) {
   return docs.filter(doc => {

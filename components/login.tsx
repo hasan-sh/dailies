@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router'
 
 
-import { GoogleAuthProvider, signInAnonymously, signInWithRedirect, useDeviceLanguage, AuthError } from 'firebase/auth';
+import { GoogleAuthProvider, signInAnonymously, signInWithRedirect, useDeviceLanguage, AuthError, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase';
 
 import styles from './login.module.css';
+import Loader from './loader';
 
-export interface LoginProps  {}
+export interface LoginProps  {
+}
 
 
 const Login: React.FC<LoginProps> = (props) => {
@@ -25,7 +27,8 @@ const Login: React.FC<LoginProps> = (props) => {
             login_hint: 'dailies@example.com',
         });
 
-        await signInWithRedirect(auth, provider);
+        await signInWithPopup(auth, provider);
+        // await signInWithRedirect(auth, provider);
         router.push('/')
     };
 
@@ -40,9 +43,13 @@ const Login: React.FC<LoginProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            <button className={`btn ${styles.loginButton} `} disabled={loading} onClick={login}>
-                Login with Google
-            </button>
+            {loading ? (
+                <Loader />
+            ) : (
+                <button className={`btn ${styles.loginButton} `} disabled={loading} onClick={login}>
+                    Login with Google
+                </button>
+            )}
             {/* <button disabled={loading}
                 className={`btn ${styles.continue}`}
                 onClick={continueAnonymously}

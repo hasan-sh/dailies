@@ -13,6 +13,8 @@ import { DateContext, } from '../../store/date';
 
 import styles from './dailies.module.css'
 import { db } from '../../firebase';
+import useWindowSize from '../../components/useWindow';
+import Loader from '../../components/loader';
 
 
 
@@ -29,25 +31,39 @@ const Daily = observer(() => {
             global.window.history.back()
         return null
     }
+
+    const [loading, setLoading] = useState(true)
+    const windowSize = useWindowSize()
+
     const {date} = useContext(DateContext)
     const [markdown, setMarkdown] = useState('')
     return (
         <div className={styles.container}>
             <div className={styles.createdAt}>
-                <button className="btn" onClick={async () => {
-                    await createDaily(markdown, uid.toString(), date)
-                    router.push('/')
-                    }}>Create</button>
+                {date.toDateString()}
+                <button
+                    className="btn" 
+                    disabled={!markdown}
+                    onClick={async () => {
+                        await createDaily(markdown, uid.toString(), date)
+                        router.push('/')
+                    }}>
+                        Create
+                </button>
                 <Link href='/'>Home</Link>
             </div>
+            {loading && <Loader />}
             <MarkdownEditor
                 value={markdown}
                 onChange={value => setMarkdown(value)}
                 height="100px"
                 className={styles.mdContainer}
+                placeholder="Save your memories and thoughts!"
+                visible={windowSize.width > 600}
+                // arguments are informative
+                onCreateEditor={() => setLoading(false)}
                 autoFocus
                 editable
-                visible 
             />
         </div>
     )

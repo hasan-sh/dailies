@@ -12,6 +12,7 @@
   width: 80%;
 }
 
+
 .createdAt {
   height: 50%;
   display: flex;
@@ -72,9 +73,22 @@
 }
 
 @media (max-width: 600px) {
-  .grid {
+  .container {
+    padding: 0 5px;
+  }
+
+  .grid, .container, .createdAt {
     width: 100%;
     flex-direction: column;
+  }
+  
+  .createdAt {
+    flex-direction: row;
+    height: fit-content;
+  }
+  .mdContainer {
+    width: 100%;
+    height: 100%;
   }
 }
 

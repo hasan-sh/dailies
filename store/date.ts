@@ -4,6 +4,7 @@ import { createContext } from 'react';
 export class DateStore {
     date = new Date()
     constructor() {
+        this.date.setHours(0, 0, 0, 0);
         makeObservable(this, {
             date: observable,
             setDate: action
