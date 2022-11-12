@@ -1,5 +1,9 @@
 
 import { collection, DocumentData, Firestore, getDocs, QuerySnapshot, query, orderBy, where, Timestamp, doc, collectionGroup, QueryDocumentSnapshot  } from 'firebase/firestore/lite';
+
+import plainTextToHtml from '@ckeditor/ckeditor5-clipboard/src/utils/plaintexttohtml';
+
+
 import Link from 'next/link';
 import { ChangeEvent, useContext, useEffect, useReducer, useState } from 'react';
 import { motion, AnimateSharedLayout } from "framer-motion"
@@ -10,6 +14,7 @@ import styles from './dailies.module.css'
 import { User } from 'firebase/auth';
 import Loader from '../../components/loader';
 import { DailiesContext } from '../../store/dailies';
+import { parseHTML } from './utils';
 
 
 interface DailiesProps {
@@ -90,8 +95,9 @@ export default function Dailies({ date, user }: DailiesProps) {
                 key={doc.id}
                 >
 
-                <h2>{createdAt.toDateString()} &rarr; &rarr;</h2>
-                <p>{daily.text}</p>
+                <h2>{createdAt.toDateString()} &rarr;</h2>
+                {/* <p>{daily.text}</p> */}
+                {parseHTML(daily.text.substring(0, 100))}
               </Link>
             </motion.div>
           })}

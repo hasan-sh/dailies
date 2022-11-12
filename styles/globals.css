@@ -39,3 +39,23 @@ a {
     background: black;
   }
 }
+
+
+.ck-editor {
+    height: 50% !important;
+    display: flex;
+    flex-direction: column;
+    width: clamp(60%, 100%, 60%) !important;
+}
+
+.ck-editor__main {
+  flex: 1
+}
+
+.ck-editor__editable {
+  height: 100%;
+}
+
+.ck-toolbar__items {
+  justify-content: space-between;
+}

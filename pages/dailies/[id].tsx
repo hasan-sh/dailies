@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router'
 
 import dynamic from 'next/dynamic';
-import '@uiw/react-markdown-editor/markdown-editor.css';
-import '@uiw/react-markdown-preview/markdown.css';
+
 
 import styles from './dailies.module.css'
 import { db } from '../../firebase';
@@ -11,13 +10,17 @@ import { collection, doc, getDoc, query, setDoc, Timestamp, where } from 'fireba
 import Link from 'next/link';
 import useWindowSize from '../../components/useWindow';
 import Loader from '../../components/loader';
+import { DEFAULT_CONFIG } from './constants';
+import Switch from '../../components/switch';
 
+const Editor = dynamic(() => import('../../components/editor'));
 
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+// const ClassicEditor = dynamic(
+//   () => import("@ckeditor/ckeditor5-build-classic").then((mod) => mod.default),
+//   { ssr: false }
+// );
 
-const MarkdownEditor = dynamic(
-  () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
-  { ssr: false }
-);
 
 const Daily = () => {
     const router = useRouter()
@@ -26,6 +29,7 @@ const Daily = () => {
     const [createdAt, setCreatedAt] = useState(time)
     const [loading, setLoading] = useState(true)
     const windowSize = useWindowSize()
+    const [editor, setEditor] = useState<ClassicEditor>()
 
 
     useEffect(() => {
@@ -49,6 +53,20 @@ const Daily = () => {
     return (
         <div className={styles.container}>
             <div className={styles.createdAt}>
+                <Switch title='Arabic' cb={async arabic => {
+                    if (!editor) return 
+                    console.log('clicking...')
+                    setLoading(true)
+                    const el = editor.sourceElement
+                    await editor.destroy()
+                    const nEditor = await ClassicEditor.create(el || '', {
+                        ...DEFAULT_CONFIG,
+                        language: arabic ? 'ar' : 'en',
+                    })
+                    nEditor.setData(markdown)
+                    setEditor(nEditor)
+                    setLoading(false)
+                }}/>
                 {createdAt}
                 <button className="btn" onClick={async () => {
                     if (id) {
@@ -59,7 +77,31 @@ const Daily = () => {
                 <Link href='/'>Home</Link>
             </div>
             {loading && <Loader />}
-            <MarkdownEditor
+            <Editor
+                data={markdown}
+                onChange={setMarkdown}
+                onReady={e => {
+                    setEditor(e)
+                    setLoading(false)
+                }}
+            />
+            {/* <CKEditor
+                id='editor'
+                config={DEFAULT_CONFIG}
+                editor={ClassicEditor}
+                data={markdown}
+                onReady={editor => {
+                    editor.focus()
+                    setEditor(editor)
+                    setLoading(false)
+                }}
+                onChange={(event, editor) => {
+                    const data = editor.getData();
+                    console.log({ event, editor, data });
+                    setMarkdown(data)
+                }}
+            /> */}
+            {/* <MarkdownEditor
                 value={markdown}
                 onChange={value => setMarkdown(value)}
                 height="100%"
@@ -69,7 +111,7 @@ const Daily = () => {
                 onCreateEditor={() => setLoading(false)}
                 autoFocus
                 editable
-            />
+            /> */}
         </div>
     )
 }
