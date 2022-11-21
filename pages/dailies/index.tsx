@@ -1,7 +1,5 @@
 
-import { collection, DocumentData, Firestore, getDocs, QuerySnapshot, query, orderBy, where, Timestamp, doc, collectionGroup, QueryDocumentSnapshot  } from 'firebase/firestore/lite';
-
-import plainTextToHtml from '@ckeditor/ckeditor5-clipboard/src/utils/plaintexttohtml';
+import { collection, DocumentData, onSnapshot, query, where, QueryDocumentSnapshot  } from 'firebase/firestore';
 
 
 import Link from 'next/link';
@@ -14,7 +12,8 @@ import styles from './dailies.module.css'
 import { User } from 'firebase/auth';
 import Loader from '../../components/loader';
 import { DailiesContext } from '../../store/dailies';
-import { parseHTML } from './utils';
+import { parseHTML } from '../../utils';
+import { observer } from 'mobx-react-lite';
 
 
 interface DailiesProps {
@@ -22,7 +21,7 @@ interface DailiesProps {
     user: User
 }
 
-export default function Dailies({ date, user }: DailiesProps) {
+function Dailies({ date, user }: DailiesProps) {
 
 
   if (!date) {
@@ -30,34 +29,19 @@ export default function Dailies({ date, user }: DailiesProps) {
     date.setHours(0, 0, 0, 0);
   }
 
-
-  const { dailies: staticDailies, getDailies } = useContext(DailiesContext)
-
-  const [dailies, setDailies] = useState<QueryDocumentSnapshot<DocumentData>[]>()
-  const [firstRun, setFirstRun] = useState(true)
+  const { dailies, setDailies, firstRun, setFirstRun } = useContext(DailiesContext)
 
   useEffect(() => {
-    async function init() {
-      const newDailies = await getDailies(db, user.uid)
-      const filteredDailies = filterByDate(newDailies, date)
-      setDailies(filteredDailies)
-    }
-
-    init()
+        const colRef = collection(db, 'dailies');
+        const q = query(colRef, where('uid', '==', user.uid))//orderBy('createdAt', 'asc'))
+        const unsub = onSnapshot(q, (ss) => {
+            const docs = sortByDate(ss.docs)
+            setDailies(docs)
+            setFirstRun(false)
+        });
+        return unsub
   }, [])
 
-  useEffect(() => {
-    async function init() {
-      if (!firstRun && date && staticDailies) {
-        const newDailies = filterByDate(staticDailies, date)
-        setDailies(newDailies)
-      }
-    }
-
-    init()
-    setFirstRun(false)
-
-  }, [date])
 
   if (!user) {
     return null
@@ -73,7 +57,9 @@ export default function Dailies({ date, user }: DailiesProps) {
 
       <AnimateSharedLayout>
         <motion.ul layout className={styles.grid}>
-          {dailies?.map((doc: DocumentData) => {
+
+          {dailies && filterByDate(dailies, date)?.map((doc: DocumentData) => {
+          // {dailies?.map((doc: DocumentData) => {
             const daily = doc.data()
             const createdAt = new Date(daily.createdAt.seconds * 1000)
             return <motion.div
@@ -89,7 +75,7 @@ export default function Dailies({ date, user }: DailiesProps) {
               <Link
                 href={{
                   pathname: `/dailies/${doc.id}`,
-                  query: { ...daily, createdAt: createdAt.toDateString() },
+                  query: { ...daily, createdAt: createdAt.toDateString(), language: daily.lang },
                 }}
                 as={`/dailies/${doc.id}`}
                 key={doc.id}
@@ -118,15 +104,7 @@ export default function Dailies({ date, user }: DailiesProps) {
   )
 }
 
-// async function getDailies(db: Firestore, userId: string) {
-//   const colRef = collection(db, 'dailies');
-//   // const docRef = getDocs(colRef, userId)
-//   const q = query(colRef, where('uid', '==', userId))//orderBy('createdAt', 'asc'))
-//   const dailySnapshot = await getDocs(q);
-  
-//   const docs = sortByDate(dailySnapshot.docs)
-//   return docs;
-// }
+export default observer(Dailies)
 
 function filterByDate(docs: QueryDocumentSnapshot<DocumentData>[], date: Date) {
   return docs.filter(doc => {

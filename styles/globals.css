@@ -40,12 +40,20 @@ a {
   }
 }
 
+@media (max-width: 600px) {
+  .btn {
+    padding: 5px;
+    font-size: 1em;
+  }
+}
+
 
 .ck-editor {
     height: 50% !important;
+    /* height: 100% !important; */
     display: flex;
     flex-direction: column;
-    width: clamp(60%, 100%, 60%) !important;
+    width: clamp(60%, 100%, 100%) !important;
 }
 
 .ck-editor__main {
@@ -56,6 +64,40 @@ a {
   height: 100%;
 }
 
-.ck-toolbar__items {
+/* .ck-toolbar__items {
   justify-content: space-between;
+} */
+
+
+.remove {
+  background: none;
+  outline: none;
+  border: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-weight: 900;
+  color: red;
+  padding: 0;
+}
+
+.remove:hover {
+  cursor: pointer;
+}
+
+.busy::after {
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: red;
+    content: "Saving..";
+}
+
+.done::after {
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "Saved!";
 }

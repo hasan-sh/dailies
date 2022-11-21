@@ -1,36 +1,28 @@
-import { collection, DocumentData, Firestore, getDocs, query, QueryDocumentSnapshot, where } from 'firebase/firestore/lite';
+import { collection, DocumentData, Firestore, getDocs, query, QueryDocumentSnapshot, where, onSnapshot, Unsubscribe } from 'firebase/firestore';
+// import { onSnapshot } from 'firebase/firestore'
 import { action, makeObservable, observable } from 'mobx';
 import { createContext } from 'react';
 
 export class DailiesStore {
     dailies: QueryDocumentSnapshot<DocumentData>[]
+    firstRun: boolean = true
     constructor() {
         this.dailies = []
         makeObservable(this, {
+            firstRun: observable,
             dailies: observable,
-            addDaily: action,
-            getDailies: action.bound
+            setFirstRun: action,
+            setDailies: action,
         })
     }
 
-    async getDailies(db: Firestore, userId: string) {
-        if (this.dailies.length) {
-            return this.dailies
-        }
-        const colRef = collection(db, 'dailies');
-        // const docRef = getDocs(colRef, userId)
-        const q = query(colRef, where('uid', '==', userId))//orderBy('createdAt', 'asc'))
-        const dailySnapshot = await getDocs(q);
-        
-        const docs = sortByDate(dailySnapshot.docs)
-        this.dailies = docs
-        return docs;
+    setDailies = (dailies: QueryDocumentSnapshot<DocumentData>[]) => {
+        this.dailies = dailies
     }
 
-
-    addDaily = (daily: QueryDocumentSnapshot<DocumentData>) => {
-        this.dailies.push(daily)
-    };
+    setFirstRun = (v: boolean) => {
+        this.firstRun = v
+    }
 }
 
 export const DailiesContext = createContext(new DailiesStore());

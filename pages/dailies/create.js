@@ -1,25 +1,25 @@
 
-import { useContext, useEffect, useReducer, useState } from 'react';
+import { useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { useRouter } from 'next/router'
 
 
 import dynamic from 'next/dynamic';
     
-import { collection, doc, getDoc, Timestamp, addDoc, setDoc, } from 'firebase/firestore/lite';
+import { collection, doc, getDoc, Timestamp, addDoc, setDoc, } from 'firebase/firestore';
 import { observer } from "mobx-react-lite"
 import Link from 'next/link';
 import { DateContext, } from '../../store/date';
 
 import styles from './dailies.module.css'
 import { db } from '../../firebase';
-import useWindowSize from '../../components/useWindow';
+// import useWindowSize from '../../components/useWindow';
 import Loader from '../../components/loader';
 import Switch from '../../components/switch';
-import { DEFAULT_CONFIG } from './constants';
+import { DEFAULT_CONFIG } from '../../constants';
 
 
 const Editor  = dynamic(() => import('../../components/editor'));
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+// import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 
 
 const Daily = observer(() => {
@@ -27,8 +27,9 @@ const Daily = observer(() => {
     const router = useRouter()
     const { uid }  = router.query
     if (!uid) {
-        if (global?.window)
+        if (global?.window) {
             global.window.history.back()
+        }
         return null
     }
 
@@ -37,30 +38,21 @@ const Daily = observer(() => {
 
     const {date} = useContext(DateContext)
     const [markdown, setMarkdown] = useState('')
-    const [editor, setEditor] = useState<ClassicEditor>()
+    const [lang, setLang] = useState()
 
     return (
         <div className={styles.container}>
             <div className={styles.createdAt}>
-                <Switch title='Arabic' cb={async arabic => {
-                    if (!editor) return 
-                    console.log('clicking...')
-                    setLoading(true)
-                    const el = editor.sourceElement
-                    await editor.destroy()
-                    const nEditor = await ClassicEditor.create(el || '', {
-                        ...DEFAULT_CONFIG,
-                        language: arabic ? 'ar' : 'en',
-                    })
-                    setEditor(nEditor)
-                    setLoading(false)
+                <Switch title='Arabic' cb={arabic => {
+                    const language = arabic ? 'ar' : 'en'
+                    setLang(language)
                 }}/>
                 {date.toDateString()}
                 <button
                     className="btn"
                     disabled={!markdown}
                     onClick={async () => {
-                        await createDaily(markdown, uid.toString(), date)
+                        await createDaily(markdown, uid.toString(), date, lang)
                         router.push('/')
                     }}>
                     Create
@@ -70,10 +62,20 @@ const Daily = observer(() => {
             {loading && <Loader />}
             <Editor 
                 data={markdown}
+                language={lang}
                 onChange={setMarkdown}
                 onReady={e => {
-                    setEditor(e)
                     setLoading(false)
+                }}
+                waitingTime={10000} // 10 seconds
+                autoSave={async data => {
+                    if (data && data !== markdown) {
+                        const { id } = await createDaily(data, uid.toString(), date, lang)
+                        router.push('/dailies/' + id, `/dailies/${id}`,
+                         {
+                            query: { text: data, createdAt: Timestamp.fromDate(date), language: lang, uid: uid.toString() },
+                        })
+                    }
                 }}
             />
             {/* <MarkdownEditor
@@ -95,13 +97,14 @@ const Daily = observer(() => {
 export default Daily
 
 
-async function createDaily(md: string, userId: string, date: Date) {
+async function createDaily(md, userId, date, lang='en') {
     const colRef = collection(db, 'dailies')
-    // const docRef = doc(colRef, userId)
-
-    await addDoc(colRef, {
+    // const docRef = doc(db, 'dailies', userId)
+    const doc = await addDoc(colRef, {
         text: md,
         createdAt: Timestamp.fromDate(date),
         uid: userId,
+        lang
     })
+    return doc
 }

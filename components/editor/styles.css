@@ -1,0 +1,16 @@
+
+.busy::after {
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "NEW_CONTENT";
+}
+
+.done::after {
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "NEW_CONTENT";
+}
