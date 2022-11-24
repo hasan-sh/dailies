@@ -13,8 +13,8 @@ import styles from "./styles.module.css";
  * animation is now fully compatible with user-set transforms.
  */
 
-export default function Switch({ title, cb }: {title: string, cb: (a: boolean) => void }) {
-  const [isOn, setIsOn] = useState(false);
+export default function Switch({ title, cb, value=false }: {title: string, cb: (a: boolean) => void, value: boolean }) {
+  const [isOn, setIsOn] = useState(value);
 
   const toggleSwitch = () => {
     cb(!isOn)
