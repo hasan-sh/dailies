@@ -16,6 +16,7 @@ import Dailies from './dailies';
 import Login from '../components/login';
 import { DateContext } from '../store/date';
 import Splash from '../components/splash';
+import { DailiesContext } from '../store/dailies';
 
 
 interface HomeProps {
@@ -25,6 +26,7 @@ interface HomeProps {
 export default observer(function Home(props: HomeProps) {
 
   // const [date, setDate] = useState(new Date())
+  const { dailies } = useContext(DailiesContext)
   const {date, setDate} = useContext(DateContext)
   const [user, setUser] = useState(props.user)
 
@@ -63,7 +65,20 @@ export default observer(function Home(props: HomeProps) {
               setUser(props.user)
             }}>Sign out</button>
 
-            <Calendar onChange={setDate} value={date} />
+            <Calendar onChange={setDate} value={date} tileClassName={({ activeStartDate, date, view }) => {
+              if (!dailies) {
+                return null
+              }
+              // console.log(dailies)
+              // console.log(activeStartDate, date, view)
+              const hasDaily = dailies.find(d => {
+                const da = d.data()
+                const createdAt = new Date(da.createdAt.seconds * 1000)
+                return createdAt.toLocaleString() === date.toLocaleString()
+              })
+              // console.log(hasDaily, date)
+              return hasDaily ? styles.hasDaily : null 
+            }}/>
 
             <Dailies date={date} user={user} />
           </>

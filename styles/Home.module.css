@@ -19,6 +19,10 @@
   align-items: center;
 }
 
+.hasDaily {
+  background-color: rgb(54 206 123 / 33%);
+}
+
 .footer {
   display: flex;
   flex: 1;
