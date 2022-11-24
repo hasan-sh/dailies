@@ -24,42 +24,14 @@ const Editor = dynamic(() => import('../../components/editor'));
 //   { ssr: false }
 // );
 
+const DailyControl = ({data, onChange}) => {
 
-const Daily = () => {
-    const router = useRouter()
-    const { id, text, createdAt: time, language } = router.query
-    const [markdown, setMarkdown] = useState(text?.toString() || '')
-    const [lang, setLang] = useState(language)
-    const [createdAt, setCreatedAt] = useState(time)
-    const [loading, setLoading] = useState(true)
-    // const windowSize = useWindowSize()
-
-    useEffect(() => {
-        async function init() {
-            if (!id)
-                return
-            const daily = await getDaily(id)
-            const data = daily.data()
-            if (data) {
-                setMarkdown(data.text)
-                setLang(data.lang)
-                const ct = new Date(data.createdAt.seconds * 1000)
-                setCreatedAt(ct.toDateString())
-            } else {
-                router.push('/dailies')
-            }
-        }
-        init()
-
-    }, [id])
-
-    return (
-        <div className={styles.container}>
-            <div className={styles.createdAt}>
-                <Switch arabic={lang === 'ar'} title='Arabic' cb={arabic => {
+    return <div className={styles.createdAt}>
+                <Switch value={lang === 'ar'} title='Arabic' cb={arabic => {
                     const language = arabic ? 'ar' : 'en'
                     setLang(language)
                 }} />
+                <Switch value={pinned} title='Pin' cb={setPinned} />
                 {createdAt}
                 {/* <SideMenu /> */}
                 {/* <motion.button
@@ -81,7 +53,6 @@ const Daily = () => {
                         const answer = confirm('Delete it?')
                         if (answer) {
                             // remove it
-                            console.log('remote it', doc)
                             const docRef = doc(db, 'dailies', id)
                             await deleteDoc(docRef)
                             router.push('/')
@@ -90,20 +61,98 @@ const Daily = () => {
 
                 <Link href='/'>Home</Link>
             </div>
+}
+
+const Daily = () => {
+    const router = useRouter()
+    const { id, text, createdAt: time, language, pinned: isPinned } = router.query
+    const [markdown, setMarkdown] = useState(text?.toString() || '')
+    const [newContent, setNewContent] = useState('')
+    const [lang, setLang] = useState(language)
+    const [createdAt, setCreatedAt] = useState(time)
+    const [pinned, setPinned] = useState(isPinned)
+    const [loading, setLoading] = useState(true)
+    // const windowSize = useWindowSize()
+
+    useEffect(() => {
+        async function init() {
+            if (!id)
+                return
+            const daily = await getDaily(id)
+            const data = daily.data()
+            if (data) {
+                setMarkdown(data.text)
+                setLang(data.lang)
+                setPinned(data.pinned)
+                const ct = new Date(data.createdAt.seconds * 1000)
+                setCreatedAt(ct.toDateString())
+            } else {
+                router.push('/dailies')
+            }
+        }
+        init()
+
+    }, [id])
+
+    useEffect(() => {
+        const autosave = async data => {
+            await updateDaily(data, id.toString(), lang, pinned)
+        }
+
+        if (newContent) {
+            autosave(newContent)
+        }
+        
+    }, [newContent, lang, pinned])
+
+    return (
+        <div className={styles.container}>
+            {/* <DailyControl data={{markdown, lang, pinned, createdAt}} onChange={handleChange} /> */}
+            {!loading && <div className={styles.createdAt}>
+                <Switch value={lang === 'ar'} title='Arabic' cb={arabic => {
+                    const language = arabic ? 'ar' : 'en'
+                    setLang(language)
+                }} />
+                <Switch value={pinned} title='Pin' cb={setPinned} />
+                {createdAt}
+                {/* <SideMenu /> */}
+                {/* <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.99 }}
+                    className="btn" 
+                    onClick={async () => {
+                        if (id) {
+                            await updateDaily(markdown, id.toString(), lang)
+                            router.push('/')
+                        }
+                    }}>Update</motion.button> */}
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.99 }}
+                    className="btn pink"
+                    onClick={async (e) => {
+                        e.stopPropagation()
+                        const answer = confirm('Delete it?')
+                        if (answer) {
+                            // remove it
+                            const docRef = doc(db, 'dailies', id)
+                            await deleteDoc(docRef)
+                            router.push('/')
+                        }
+                    }}>Delete</motion.button>
+
+                <Link href='/'>Home</Link>
+            </div>}
             {loading && <Loader />}
-            <Editor
+            {id && <Editor
                 data={markdown}
                 language={lang}
                 onChange={setMarkdown}
                 onReady={e => {
                     setLoading(false)
                 }}
-                autoSave={async data => {
-                    if (data && data !== markdown) {
-                        await updateDaily(data, id.toString(), lang)
-                    }
-                }}
-            />
+                autoSave={setNewContent}
+            />}
         </div>
     )
 }
@@ -118,13 +167,14 @@ async function getDaily(id) {
 }
 
 
-async function updateDaily(md, id, lang='en') {
+async function updateDaily(md, id, lang='en', pinned=false) {
     const docRef = doc(db, 'dailies', id)
 
     await setDoc(docRef, {
         text: md,
         updatedAt: Timestamp.now(),
-        lang
+        lang,
+        pinned
     }, {
         merge: true
     })

@@ -71,7 +71,7 @@ function Dailies({ date, user }: DailiesProps) {
               transition={{
                 staggerChildren: 1
               }}
-              className={styles.card}>
+              className={`${styles.card} ${daily.pinned ? styles.pinned : ''}`}>
               <Link
                 href={{
                   pathname: `/dailies/${doc.id}`,
@@ -109,7 +109,7 @@ export default observer(Dailies)
 function filterByDate(docs: QueryDocumentSnapshot<DocumentData>[], date: Date) {
   return docs.filter(doc => {
     const data = doc.data()
-    return date <= new Date(data.createdAt.seconds*1000)
+    return date <= new Date(data.createdAt.seconds*1000) || data.pinned
   })
 }
 
@@ -117,6 +117,10 @@ function sortByDate(docs: QueryDocumentSnapshot<DocumentData>[]) {
   return docs.sort((a, b) => {
     const aData = a.data()
     const bData = b.data()
+    if (aData.pinned && !bData.pinned) {
+      return -1
+    } 
+    // else by date!
     return aData.createdAt.seconds - bData.createdAt.seconds
   })
 }

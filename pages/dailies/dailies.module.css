@@ -46,12 +46,23 @@
   max-width: 300px;
 }
 
+
+.pinned,
 .card:hover,
 .card:focus,
 .card:active {
   color: #0070f3;
   border-color: #0070f3;
   scale: 1.05;
+}
+
+/* TODO: show icon instead! */
+.pinned::after {
+  content: 'Pinned';
+  top: 2px;
+  left: 5px;
+  position: absolute;
+  color: yellowgreen;
 }
 
 

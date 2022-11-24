@@ -51,7 +51,6 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
 
         if (!statusIndicator) return
         pendingActions.on( 'change:hasAny', ( evt, propertyName, newValue ) => {
-            console.log(newValue, editor.getData())
             if ( newValue ) {
                 statusIndicator.classList.remove( 'done' );
                 statusIndicator.classList.add( 'busy' );
