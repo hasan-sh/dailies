@@ -10,6 +10,12 @@ const Splash = () => {
         const timeout = setTimeout(() => setFirstRun(false), 1300)
         return () => clearTimeout(timeout)
     }, [])
+    useEffect(() => {
+        if (firstRun) {
+          const interval = setInterval(() => firstRun && setFirstRun(false), 2000)
+          return () => clearInterval(interval)
+        }
+    }, [firstRun])
 
     if (!firstRun) {
       return null
