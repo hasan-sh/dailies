@@ -47,7 +47,6 @@
 }
 
 
-.pinned,
 .card:hover,
 .card:focus,
 .card:active {
@@ -57,12 +56,12 @@
 }
 
 /* TODO: show icon instead! */
-.pinned::after {
-  content: 'Pinned';
-  top: 2px;
+.pinned {
+  scale: 1.2;
+  top: 5px;
   left: 5px;
   position: absolute;
-  color: yellowgreen;
+  color: rgb(54 206 123 / 85%);
 }
 
 

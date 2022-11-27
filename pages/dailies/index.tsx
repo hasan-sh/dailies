@@ -1,6 +1,6 @@
 
 import { collection, DocumentData, onSnapshot, query, where, QueryDocumentSnapshot  } from 'firebase/firestore';
-
+import { BsPinFill } from 'react-icons/bs'
 
 import Link from 'next/link';
 import { ChangeEvent, useContext, useEffect, useReducer, useState } from 'react';
@@ -71,7 +71,8 @@ function Dailies({ date, user }: DailiesProps) {
               transition={{
                 staggerChildren: 1
               }}
-              className={`${styles.card} ${daily.pinned ? styles.pinned : ''}`}>
+              className={styles.card}>
+              {daily.pinned && <BsPinFill className={styles.pinned} color='red' />}
               <Link
                 href={{
                   pathname: `/dailies/${doc.id}`,
