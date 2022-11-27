@@ -24,6 +24,7 @@
   padding: 5px;
 }
 
+
 .grid {
   display: flex;
   align-items: center;
@@ -100,6 +101,14 @@
   .mdContainer {
     width: 100%;
     height: 100%;
+  }
+
+  .createdAt {
+    flex-direction: column;
+  }
+  
+  .createdAt > * {
+    margin: 5px;
   }
 }
 
