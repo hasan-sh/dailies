@@ -84,6 +84,20 @@
   margin-left: 0.5rem;
 }
 
+.searchContainer {
+  width: 100%;
+  text-align: center;
+}
+
+.searchInput {
+  padding: 6px;
+  margin-top: 8px;
+  font-size: 17px;
+  border: black 1.2px dashed;
+  outline: none;
+}
+
+
 @media (max-width: 600px) {
   .container {
     padding: 0 5px;
@@ -106,7 +120,7 @@
   .createdAt {
     flex-direction: column;
   }
-  
+
   .createdAt > * {
     margin: 5px;
   }

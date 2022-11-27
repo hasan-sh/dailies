@@ -3,7 +3,7 @@ import { collection, DocumentData, onSnapshot, query, where, QueryDocumentSnapsh
 import { BsPinFill } from 'react-icons/bs'
 
 import Link from 'next/link';
-import { ChangeEvent, useContext, useEffect, useReducer, useState } from 'react';
+import { ChangeEvent, ChangeEventHandler, EventHandler, useContext, useEffect, useReducer, useState } from 'react';
 import { motion, AnimateSharedLayout } from "framer-motion"
 
 // import UserContext from '../userContext'
@@ -30,6 +30,7 @@ function Dailies({ date, user }: DailiesProps) {
   }
 
   const { dailies, setDailies, firstRun, setFirstRun } = useContext(DailiesContext)
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
         const colRef = collection(db, 'dailies');
@@ -47,6 +48,18 @@ function Dailies({ date, user }: DailiesProps) {
     return null
   }
 
+  function searchHandler(e: ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value
+    setSearchTerm(value)
+  }
+
+  function filterRelevant() {
+    if (searchTerm.length > 2) {
+      return filterBySearch(dailies, searchTerm)
+    }
+    return filterByDate(dailies, date)
+  }
+  
   return (
     <div className={styles.grid}>
       {!dailies?.length && firstRun && (
@@ -54,11 +67,21 @@ function Dailies({ date, user }: DailiesProps) {
           <Loader />
         </div>
       )}
+      {dailies.length && (
+        <div className={styles.searchContainer}>
+          <input
+            type="search"
+            className={styles.searchInput}
+            onChange={searchHandler}
+            value={searchTerm}
+            placeholder="Search.." />
+        </div>
+      )}
 
       <AnimateSharedLayout>
         <motion.ul layout className={styles.grid}>
 
-          {dailies && filterByDate(dailies, date)?.map((doc: DocumentData) => {
+          {dailies && filterRelevant()?.map((doc: DocumentData) => {
           // {dailies?.map((doc: DocumentData) => {
             const daily = doc.data()
             const createdAt = new Date(daily.createdAt.seconds * 1000)
@@ -125,5 +148,14 @@ function sortByDate(docs: QueryDocumentSnapshot<DocumentData>[]) {
     }
     // else by date!
     return aData.createdAt.seconds - bData.createdAt.seconds
+  })
+}
+
+function filterBySearch(docs: QueryDocumentSnapshot<DocumentData>[], term: string) {
+  return docs.filter(d => {
+    const data = d.data()
+    const terms = term.trim().split(' ')
+    const exists = terms.some(t => data.text.toLowerCase().includes(t.toLocaleLowerCase()))
+    return exists
   })
 }
