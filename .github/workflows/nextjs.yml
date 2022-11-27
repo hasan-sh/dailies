@@ -24,7 +24,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-    API_KEY: ${{ secrets.API_KEY }}
+    API_KEY: ${secrets.API_KEY}
     APP_ID: ${{ secrets.APP_ID }}
     NAME: HASAN
     
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Test
-        run: echo "Hi, $NAME. ${{env.APP_ID}}"
+        run: echo "Hi, $NAME. ${{secrets.MY_KEY}} ${{secrets.APP_ID}}"
       - name: Checkout
         uses: actions/checkout@v3
       - name: Detect package manager
