@@ -118,9 +118,11 @@ function sortByDate(docs: QueryDocumentSnapshot<DocumentData>[]) {
   return docs.sort((a, b) => {
     const aData = a.data()
     const bData = b.data()
-    if (aData.pinned && !bData.pinned) {
+    if (aData.pinned ) {
       return -1
-    } 
+    } else if (bData.pinned) {
+      return 1
+    }
     // else by date!
     return aData.createdAt.seconds - bData.createdAt.seconds
   })
