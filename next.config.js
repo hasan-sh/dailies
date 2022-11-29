@@ -7,6 +7,7 @@ const withPWA = require('next-pwa')({
 const removeImports = require('next-remove-imports')();
 
 const nextConfig = {
+  trailingSlash: true,
   reactStrictMode: false,
   swcMinify: true,
   images: {
