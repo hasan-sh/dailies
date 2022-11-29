@@ -5,19 +5,27 @@ import { createContext } from 'react';
 
 export class DailiesStore {
     dailies: QueryDocumentSnapshot<DocumentData>[]
+    selectedDaily: any
     firstRun: boolean = true
     constructor() {
         this.dailies = []
+        this.selectedDaily = {}
         makeObservable(this, {
             firstRun: observable,
             dailies: observable,
+            selectedDaily: observable,
             setFirstRun: action,
             setDailies: action,
+            setSelectedDaily: action,
         })
     }
 
     setDailies = (dailies: QueryDocumentSnapshot<DocumentData>[]) => {
         this.dailies = dailies
+    }
+
+    setSelectedDaily = (daily: any) => {
+        this.selectedDaily = daily
     }
 
     setFirstRun = (v: boolean) => {

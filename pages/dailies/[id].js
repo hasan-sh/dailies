@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router'
 
 import dynamic from 'next/dynamic';
@@ -13,6 +13,8 @@ import Link from 'next/link';
 import Loader from '../../components/loader';
 import { DEFAULT_CONFIG } from '../../constants';
 import Switch from '../../components/switch';
+import { DailiesContext } from '../../store/dailies';
+import { observer } from 'mobx-react-lite';
 
 // import SideMenu from '../../components/sideMenu';
 
@@ -64,33 +66,22 @@ const DailyControl = ({data, onChange}) => {
 }
 
 const Daily = () => {
+    const { selectedDaily, firstRun } = useContext(DailiesContext)
+
     const router = useRouter()
-    const { id, text, createdAt: time, language, pinned: isPinned } = router.query
-    const [markdown, setMarkdown] = useState(text?.toString() || '')
+    // const { id, text, createdAt: time, language, pinned: isPinned } = router.query
+    const { id, text, createdAt: time, language, pinned: isPinned } = selectedDaily
+    const [markdown, setMarkdown] = useState(text)
     const [newContent, setNewContent] = useState('')
     const [lang, setLang] = useState(language)
     const [createdAt, setCreatedAt] = useState(time)
     const [pinned, setPinned] = useState(isPinned)
     const [loading, setLoading] = useState(true)
     // const windowSize = useWindowSize()
-
     useEffect(() => {
-        async function init() {
-            if (!id)
-                return
-            const daily = await getDaily(id)
-            const data = daily.data()
-            if (data) {
-                setMarkdown(data.text)
-                setLang(data.lang)
-                setPinned(data.pinned)
-                const ct = new Date(data.createdAt.seconds * 1000)
-                setCreatedAt(ct.toDateString())
-            } else {
-                router.push('/dailies')
-            }
+        if (!id) {
+            router.push('/')
         }
-        init()
 
     }, [id])
 
@@ -114,7 +105,7 @@ const Daily = () => {
                     setLang(language)
                 }} />
                 <Switch value={pinned} title='Pin' cb={setPinned} />
-                {createdAt}
+                {createdAt.toDateString()}
                 {/* <SideMenu /> */}
                 {/* <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -157,7 +148,7 @@ const Daily = () => {
     )
 }
 
-export default Daily
+export default observer(Daily)
 
 
 async function getDaily(id) {

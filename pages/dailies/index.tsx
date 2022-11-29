@@ -29,7 +29,7 @@ function Dailies({ date, user }: DailiesProps) {
     date.setHours(0, 0, 0, 0);
   }
 
-  const { dailies, setDailies, firstRun, setFirstRun } = useContext(DailiesContext)
+  const { dailies, setDailies, setSelectedDaily, firstRun, setFirstRun } = useContext(DailiesContext)
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
@@ -85,10 +85,15 @@ function Dailies({ date, user }: DailiesProps) {
           // {dailies?.map((doc: DocumentData) => {
             const daily = doc.data()
             const createdAt = new Date(daily.createdAt.seconds * 1000)
+            const updatedAt = new Date(daily.updatedAt.seconds * 1000)
             return <motion.div
               layout
               layoutId={doc.id}
               key={doc.id}
+              onClick={() => {
+                // cuz daily is a proxy!
+                setSelectedDaily({id: daily.uid, createdAt, text: daily.text, pinned: daily.pinned, updatedAt})
+              }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{
@@ -97,11 +102,12 @@ function Dailies({ date, user }: DailiesProps) {
               className={styles.card}>
               {daily.pinned && <BsPinFill className={styles.pinned} color='red' />}
               <Link
-                href={{
-                  pathname: `/dailies/${doc.id}`,
-                  query: { ...daily, createdAt: createdAt.toDateString(), language: daily.lang },
-                }}
-                as={`/dailies/${doc.id}`}
+                href="/dailies/my-daily" 
+                // href={{
+                //   pathname: `/dailies/${doc.id}`,
+                //   query: { ...daily, createdAt: createdAt.toDateString(), language: daily.lang },
+                // }}
+                // as={`/dailies/${doc.id}`}
                 key={doc.id}
                 >
 
