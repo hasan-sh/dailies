@@ -85,7 +85,10 @@ function Dailies({ date, user }: DailiesProps) {
           // {dailies?.map((doc: DocumentData) => {
             const daily = doc.data()
             const createdAt = new Date(daily.createdAt.seconds * 1000)
-            const updatedAt = new Date(daily.updatedAt.seconds * 1000)
+            let updatedAt: Date;
+            if (daily.updatedAt) {
+              updatedAt = new Date(daily.updatedAt.seconds * 1000)
+            }
             return <motion.div
               layout
               layoutId={doc.id}
