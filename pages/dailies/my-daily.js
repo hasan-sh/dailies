@@ -90,7 +90,8 @@ const Daily = () => {
             await updateDaily(data, id.toString(), lang, pinned)
         }
 
-        if (newContent) {
+        console.log('auto save', newContent, text)
+        if (newContent && newContent !== text) {
             autosave(newContent)
         }
         
@@ -159,6 +160,7 @@ async function getDaily(id) {
 
 
 async function updateDaily(md, id, lang='en', pinned=false) {
+    console.log('updating ', md, id)
     const docRef = doc(db, 'dailies', id)
 
     await setDoc(docRef, {

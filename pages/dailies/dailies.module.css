@@ -56,14 +56,24 @@
   scale: 1.05;
 }
 
-/* TODO: show icon instead! */
-.pinned {
-  scale: 1.2;
+.actions {
   top: 5px;
   left: 5px;
   position: absolute;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.pinned, .delete {
+  scale: 1.2;
   color: rgb(54 206 123 / 85%);
 }
+
+.delete {
+  cursor: crosshair;
+}
+
 
 
 .card h2 {

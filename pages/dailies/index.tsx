@@ -1,6 +1,6 @@
 
-import { collection, DocumentData, onSnapshot, query, where, QueryDocumentSnapshot  } from 'firebase/firestore';
-import { BsPinFill } from 'react-icons/bs'
+import { collection, DocumentData, onSnapshot, query, where, QueryDocumentSnapshot, deleteDoc, doc as Doc  } from 'firebase/firestore';
+import { BsPinFill, BsXCircle } from 'react-icons/bs'
 
 import Link from 'next/link';
 import { ChangeEvent, ChangeEventHandler, EventHandler, useContext, useEffect, useReducer, useState } from 'react';
@@ -95,7 +95,7 @@ function Dailies({ date, user }: DailiesProps) {
               key={doc.id}
               onClick={() => {
                 // cuz daily is a proxy!
-                setSelectedDaily({id: daily.uid, createdAt, text: daily.text, pinned: daily.pinned, updatedAt})
+                setSelectedDaily({id: doc.id, createdAt, text: daily.text, pinned: daily.pinned, updatedAt})
               }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -103,7 +103,22 @@ function Dailies({ date, user }: DailiesProps) {
                 staggerChildren: 1
               }}
               className={styles.card}>
-              {daily.pinned && <BsPinFill className={styles.pinned} color='red' />}
+              <div className={styles.actions}>
+                {daily.pinned && <BsPinFill className={styles.pinned} color='orange'/>}
+                {<BsXCircle 
+                  className={styles.delete} 
+                  color='red' 
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    const answer = confirm('Delete it?')
+                    if (answer) {
+                      // remove it
+                      const docRef = Doc(db, 'dailies', doc.id)
+                      await deleteDoc(docRef)
+                    }
+                  }}
+                  />}
+              </div>
               <Link
                 href="/dailies/my-daily" 
                 // href={{
