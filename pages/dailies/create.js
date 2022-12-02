@@ -16,6 +16,7 @@ import { db } from '../../firebase';
 import Loader from '../../components/loader';
 import Switch from '../../components/switch';
 import { DEFAULT_CONFIG } from '../../constants';
+import { DailiesContext } from '../../store/dailies';
 
 
 const Editor  = dynamic(() => import('../../components/editor'));
@@ -36,9 +37,26 @@ const Daily = observer(() => {
     const [loading, setLoading] = useState(true)
     // const windowSize = useWindowSize()
 
+    const { setSelectedDaily } = useContext(DailiesContext)
     const {date} = useContext(DateContext)
     const [markdown, setMarkdown] = useState('')
+    const [newContent, setNewContent] = useState('')
     const [lang, setLang] = useState()
+
+    useEffect(() => {
+        const autosave = async data => {
+            const { id } = await createDaily(data, uid.toString(), date, lang)
+            setSelectedDaily({ text: data, id, createdAt: date, language: lang, uid: uid.toString() })
+            setTimeout(() => {
+                router.push('/dailies/my-daily')
+            }, 200);
+        }
+
+        if (newContent) {
+            autosave(newContent)
+        }
+        
+    }, [newContent])
 
     return (
         <div className={styles.container}>
@@ -68,15 +86,7 @@ const Daily = observer(() => {
                     setLoading(false)
                 }}
                 waitingTime={10000} // 10 seconds
-                autoSave={async data => {
-                    if (data && data !== markdown) {
-                        const { id } = await createDaily(data, uid.toString(), date, lang)
-                        router.push('/dailies/' + id, `/dailies/${id}`,
-                         {
-                            query: { text: data, createdAt: Timestamp.fromDate(date), language: lang, uid: uid.toString() },
-                        })
-                    }
-                }}
+                autoSave={setNewContent}
             />
             {/* <MarkdownEditor
                 value={markdown}

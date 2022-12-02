@@ -65,20 +65,23 @@ export default observer(function Home(props: HomeProps) {
               setUser(props.user)
             }}>Sign out</button>
 
-            <Calendar onChange={setDate} value={date} tileClassName={({ activeStartDate, date, view }) => {
-              if (!dailies) {
-                return null
-              }
-              // console.log(dailies)
-              // console.log(activeStartDate, date, view)
-              const hasDaily = dailies.find(d => {
-                const da = d.data()
-                const createdAt = new Date(da.createdAt.seconds * 1000)
-                return createdAt.toLocaleString() === date.toLocaleString()
-              })
-              // console.log(hasDaily, date)
-              return hasDaily ? styles.hasDaily : null 
-            }}/>
+            <Calendar
+              onChange={setDate}
+              value={date}
+              tileClassName={({ activeStartDate, date, view }) => {
+                if (!dailies) {
+                  return null
+                }
+                // console.log(dailies)
+                // console.log(activeStartDate, date, view)
+                const hasDaily = dailies.find(d => {
+                  const da = d.data()
+                  const createdAt = new Date(da.createdAt.seconds * 1000)
+                  return createdAt.toLocaleString() === date.toLocaleString()
+                })
+                // console.log(hasDaily, date)
+                return hasDaily ? styles.hasDaily : null
+              }} />
 
             <Dailies date={date} user={user} />
           </>
