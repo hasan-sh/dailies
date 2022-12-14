@@ -16,6 +16,8 @@ import Switch from '../../components/switch';
 import { DailiesContext } from '../../store/dailies';
 import { observer } from 'mobx-react-lite';
 
+import { parseHTML } from '../../utils';
+
 // import SideMenu from '../../components/sideMenu';
 
 const Editor = dynamic(() => import('../../components/editor'));
@@ -71,6 +73,7 @@ const Daily = () => {
     const router = useRouter()
     // const { id, text, createdAt: time, language, pinned: isPinned } = router.query
     const { id, text, createdAt: time, language, pinned: isPinned } = selectedDaily
+    const [preview, setPreview] = useState(false)
     const [markdown, setMarkdown] = useState(text)
     const [newContent, setNewContent] = useState('')
     const [lang, setLang] = useState(language)
@@ -97,18 +100,25 @@ const Daily = () => {
         
     }, [newContent, lang, pinned])
 
+
     return (
-        <div className={styles.container}>
-            {/* <DailyControl data={{markdown, lang, pinned, createdAt}} onChange={handleChange} /> */}
-            {!loading && <div className={styles.createdAt}>
-                <Switch value={lang === 'ar'} title='Arabic' cb={arabic => {
-                    const language = arabic ? 'ar' : 'en'
-                    setLang(language)
-                }} />
-                <Switch value={pinned} title='Pin' cb={setPinned} />
-                {createdAt.toDateString()}
-                {/* <SideMenu /> */}
-                {/* <motion.button
+        <>
+            <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.99 }}
+                className="btn"
+                onClick={() => setPreview(!preview)}>{!preview ? 'Preview' : 'Edit'}</motion.button>
+            <div className={styles.container}>
+                {/* <DailyControl data={{markdown, lang, pinned, createdAt}} onChange={handleChange} /> */}
+                {!loading && !preview && <div className={styles.createdAt}>
+                    <Switch value={lang === 'ar'} title='Arabic' cb={arabic => {
+                        const language = arabic ? 'ar' : 'en'
+                        setLang(language)
+                    }} />
+                    <Switch value={pinned} title='Pin' cb={setPinned} />
+                    {createdAt.toDateString()}
+                    {/* <SideMenu /> */}
+                    {/* <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.99 }}
                     className="btn" 
@@ -118,34 +128,36 @@ const Daily = () => {
                             router.push('/')
                         }
                     }}>Update</motion.button> */}
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.99 }}
-                    className="btn pink"
-                    onClick={async (e) => {
-                        e.stopPropagation()
-                        const answer = confirm('Delete it?')
-                        if (answer) {
-                            // remove it
-                            const docRef = doc(db, 'dailies', id)
-                            await deleteDoc(docRef)
-                            router.push('/')
-                        }
-                    }}>Delete</motion.button>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.99 }}
+                        className="btn pink"
+                        onClick={async (e) => {
+                            e.stopPropagation()
+                            const answer = confirm('Delete it?')
+                            if (answer) {
+                                // remove it
+                                const docRef = doc(db, 'dailies', id)
+                                await deleteDoc(docRef)
+                                router.push('/')
+                            }
+                        }}>Delete</motion.button>
 
-                <Link href='/'>Home</Link>
-            </div>}
-            {loading && <Loader />}
-            {id && <Editor
-                data={markdown}
-                language={lang}
-                onChange={setMarkdown}
-                onReady={e => {
-                    setLoading(false)
-                }}
-                autoSave={setNewContent}
-            />}
-        </div>
+                    <Link href='/'>Home</Link>
+                </div>}
+                {loading && <Loader />}
+                {preview && <div>{parseHTML(markdown)}</div>}
+                {id && !preview && <Editor
+                    data={markdown}
+                    language={lang}
+                    onChange={setMarkdown}
+                    onReady={e => {
+                        setLoading(false)
+                    }}
+                    autoSave={setNewContent}
+                />}
+            </div>
+        </>
     )
 }
 
