@@ -59,7 +59,7 @@ const Daily = observer(() => {
     }, [newContent])
 
     return (
-        <div className={styles.container}>
+        <div className={styles.editorContainer}>
             <div className={styles.createdAt}>
                 <Switch title='Arabic' cb={arabic => {
                     const language = arabic ? 'ar' : 'en'

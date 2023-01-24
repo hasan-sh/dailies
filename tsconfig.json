@@ -17,6 +17,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/dailies/create.js", "pages/dailies/[id].js", "components/editor/index.js", "components/sideMenu/use-dimensions.js", "components/sideMenu/MenuToggle.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/dailies/create.js", "pages/dailies/[id].js", "components/editor/index.js", "components/sideMenu/use-dimensions.js", "components/sideMenu/MenuToggle.js", "components/sideMenu/index.js"],
   "exclude": ["node_modules"]
 }

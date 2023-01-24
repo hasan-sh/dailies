@@ -1,6 +1,6 @@
 import * as React from "react";
 import { motion } from "framer-motion";
-import './menu.module.css'
+import styles from './menu.module.css'
 
 const variants = {
   open: {
@@ -29,8 +29,8 @@ export const MenuItem = ({ i }: {i:number}) => {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
     >
-      <div className="icon-placeholder" style={style} />
-      <div className="text-placeholder" style={style} />
+      <div className={styles.iconPlaceholder} style={style} />
+      <div className={styles.textPlaceholder} style={style} />
     </motion.li>
   );
 };

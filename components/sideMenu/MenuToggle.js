@@ -1,6 +1,6 @@
 import * as React from "react";
 import { motion } from "framer-motion";
-import './menu.module.css'
+import styles from './menu.module.css'
 
 const Path = props => (
   <motion.path
@@ -13,7 +13,7 @@ const Path = props => (
 );
 
 export const MenuToggle = ({ toggle }) => (
-  <button onClick={toggle} className="button">
+  <button onClick={toggle} className={styles.button}>
     <svg width="23" height="23" viewBox="0 0 23 23">
       <Path
         variants={{

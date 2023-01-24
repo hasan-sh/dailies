@@ -18,7 +18,7 @@ import { observer } from 'mobx-react-lite';
 
 import { parseHTML } from '../../utils';
 
-// import SideMenu from '../../components/sideMenu';
+import SideMenu from '../../components/sideMenu';
 
 const Editor = dynamic(() => import('../../components/editor'));
 
@@ -37,7 +37,11 @@ const DailyControl = ({data, onChange}) => {
                 }} />
                 <Switch value={pinned} title='Pin' cb={setPinned} />
                 {createdAt}
-                {/* <SideMenu /> */}
+                <SideMenu content={
+                    <>
+                        <Switch value={pinned} title='Pin' cb={setPinned} />
+                    </>
+                }/>
                 {/* <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.99 }}
@@ -88,14 +92,16 @@ const Daily = () => {
 
     }, [id])
 
+    console.log(pinned)
     useEffect(() => {
         const autosave = async data => {
             await updateDaily(data, id.toString(), lang, pinned)
         }
 
-        console.log('auto save', newContent, text)
-        if (newContent && newContent !== text) {
-            autosave(newContent)
+        if ((newContent && newContent !== text) || lang !== language || pinned !== isPinned) {
+        console.log(newContent !== text, lang !== language, pinned !== isPinned)
+            console.log('auto save', newContent, text)
+            autosave(newContent || text)
         }
         
     }, [newContent, lang, pinned])
@@ -103,21 +109,32 @@ const Daily = () => {
 
     return (
         <>
-            <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.99 }}
-                className="btn"
-                onClick={() => setPreview(!preview)}>{!preview ? 'Preview' : 'Edit'}</motion.button>
             <div className={styles.container}>
                 {/* <DailyControl data={{markdown, lang, pinned, createdAt}} onChange={handleChange} /> */}
+                <SideMenu content={
+                    <>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.99 }}
+                            className="btn"
+                            onClick={() => setPreview(!preview)}>{!preview ? 'Preview' : 'Edit'}</motion.button>
+                        <Switch value={lang === 'ar'} title='Arabic' cb={arabic => {
+                            const language = arabic ? 'ar' : 'en'
+                            setLang(language)
+                        }} />
+                        <Switch value={pinned} title='Pin' cb={setPinned} />
+                    </>
+                }/>
+
+                <div className={styles.editorContainer}>
+
                 {!loading && !preview && <div className={styles.createdAt}>
-                    <Switch value={lang === 'ar'} title='Arabic' cb={arabic => {
+                    {/* <Switch value={lang === 'ar'} title='Arabic' cb={arabic => {
                         const language = arabic ? 'ar' : 'en'
                         setLang(language)
                     }} />
-                    <Switch value={pinned} title='Pin' cb={setPinned} />
+                    <Switch value={pinned} title='Pin' cb={setPinned} /> */}
                     {createdAt.toDateString()}
-                    {/* <SideMenu /> */}
                     {/* <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.99 }}
@@ -146,7 +163,7 @@ const Daily = () => {
                     <Link href='/'>Home</Link>
                 </div>}
                 {loading && <Loader />}
-                {preview && <div>{parseHTML(markdown)}</div>}
+                {preview && <div dir='auto'>{parseHTML(markdown)}</div>}
                 {id && !preview && <Editor
                     data={markdown}
                     language={lang}
@@ -156,6 +173,7 @@ const Daily = () => {
                     }}
                     autoSave={setNewContent}
                 />}
+                </div>
             </div>
         </>
     )
@@ -172,7 +190,7 @@ async function getDaily(id) {
 
 
 async function updateDaily(md, id, lang='en', pinned=false) {
-    console.log('updating ', md, id)
+    console.log('updating ', md, id, lang, pinned)
     const docRef = doc(db, 'dailies', id)
 
     await setDoc(docRef, {

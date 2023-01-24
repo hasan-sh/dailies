@@ -95,14 +95,15 @@ function Dailies({ date, user }: DailiesProps) {
               key={doc.id}
               onClick={() => {
                 // cuz daily is a proxy!
-                setSelectedDaily({id: doc.id, createdAt, text: daily.text, pinned: daily.pinned, updatedAt})
+                setSelectedDaily({id: doc.id, text: daily.text, language: daily.lang, pinned: daily.pinned, createdAt, updatedAt})
               }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{
                 staggerChildren: 1
               }}
-              className={styles.card}>
+              className={styles.card}
+              style={{textAlign: daily.lang === 'ar' ? 'right' : 'left'}}>
               <div className={styles.actions}>
                 {daily.pinned && <BsPinFill className={styles.pinned} color='orange'/>}
                 {<BsXCircle 

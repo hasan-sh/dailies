@@ -1,9 +1,18 @@
 
 .container {
-  padding: 0 2rem;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  /* justify-content: center;
+  align-items: center; */
+  height: 100vh;
+
+}
+
+.editorContainer {
+  padding: 2rem;
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* align-items: center; */
   height: 100vh;
 }
 
@@ -110,10 +119,14 @@
 
 @media (max-width: 600px) {
   .container {
+    grid-template-columns: 100%;
+  }
+
+  .editorContainer {
     padding: 0 5px;
   }
 
-  .grid, .container, .createdAt {
+  .grid, .editorContainer, .createdAt {
     width: 100%;
     flex-direction: column;
   }
