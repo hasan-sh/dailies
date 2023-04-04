@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router'
+import emailjs from '@emailjs/browser';
 
 import dynamic from 'next/dynamic';
 
@@ -28,49 +29,6 @@ const Editor = dynamic(() => import('../../components/editor'));
 //   { ssr: false }
 // );
 
-const DailyControl = ({data, onChange}) => {
-
-    return <div className={styles.createdAt}>
-                <Switch value={lang === 'ar'} title='Arabic' cb={arabic => {
-                    const language = arabic ? 'ar' : 'en'
-                    setLang(language)
-                }} />
-                <Switch value={pinned} title='Pin' cb={setPinned} />
-                {createdAt}
-                <SideMenu content={
-                    <>
-                        <Switch value={pinned} title='Pin' cb={setPinned} />
-                    </>
-                }/>
-                {/* <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.99 }}
-                    className="btn" 
-                    onClick={async () => {
-                        if (id) {
-                            await updateDaily(markdown, id.toString(), lang)
-                            router.push('/')
-                        }
-                    }}>Update</motion.button> */}
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.99 }}
-                    className="btn pink"
-                    onClick={async (e) => {
-                        e.stopPropagation()
-                        const answer = confirm('Delete it?')
-                        if (answer) {
-                            // remove it
-                            const docRef = doc(db, 'dailies', id)
-                            await deleteDoc(docRef)
-                            router.push('/')
-                        }
-                    }}>Delete</motion.button>
-
-                <Link href='/'>Home</Link>
-            </div>
-}
-
 const Daily = () => {
     const { selectedDaily, firstRun } = useContext(DailiesContext)
 
@@ -85,6 +43,9 @@ const Daily = () => {
     const [pinned, setPinned] = useState(isPinned)
     const [loading, setLoading] = useState(true)
     // const windowSize = useWindowSize()
+
+    const [email, setEmail] = useState('')
+
     useEffect(() => {
         if (!id) {
             router.push('/')
@@ -107,6 +68,23 @@ const Daily = () => {
     }, [newContent, lang, pinned])
 
 
+
+  const sendEmail = (e) => {
+    e.preventDefault();
+
+    emailjs.send('service_daily', 'daily_form', {
+        to_name: 'Has',
+        from_name: 'Hasan',
+        daily: markdown,
+        to_email: email,
+    }, process.env.EMAILJS)
+      .then((result) => {
+          console.log(result.text);
+      }, (error) => {
+          console.log(error.text);
+      });
+  };
+
     return (
         <>
             <div className={styles.container}>
@@ -123,6 +101,16 @@ const Daily = () => {
                             setLang(language)
                         }} />
                         <Switch value={pinned} title='Pin' cb={setPinned} />
+
+                        <input
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                        />
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.99 }}
+                            className="btn"
+                            onClick={sendEmail}>Invite</motion.button>
                     </>
                 }/>
 
