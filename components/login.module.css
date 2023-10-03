@@ -1,9 +1,12 @@
+
 .container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #2d2d2d2d;
-    /* height: 100vh; */
+    margin-top: -8rem;
+    /* background-color: #2d2d2d2d; */
+    height: 100vh;
 }
 
 .continue {
@@ -11,11 +14,14 @@
     background-color: transparent;
 }
 .loginButton {
-    background-color: #fffffff2;
+    /* background-color: #fffffff2; */
     color: #2d2d2d;
     box-shadow: 0px 3px 5px 1px #ffffff2d;
     transition: margin 0.2s ease-in-out, box-shadow 0.1s ease-in-out;
+    border: 1px solid #c2c8d0;
+    font-weight: 100;
 }
+
 .loginButton:focus {
     outline: none;
 }

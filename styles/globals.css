@@ -13,6 +13,7 @@ a {
 
 * {
   box-sizing: border-box;
+  font-family: ColfaxAI,-apple-system,BlinkMacSystemFont,Helvetica,sans-serif;
 }
 
 .btn {
@@ -85,19 +86,39 @@ a {
   cursor: pointer;
 }
 
-.busy::after {
-    visibility: visible;
-    position: absolute;
-    top: 0;
-    left: 0;
-    color: red;
-    content: "Saving..";
+#editor-status::after {
+  visibility: visible;
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: "Saved!";
+  color: white;
+  background-color: gray;
+  padding: 5px;
 }
 
-.done::after {
-    visibility: visible;
-    position: absolute;
-    top: 0;
-    left: 0;
-    content: "Saved!";
+.busy::after {
+  content: "Saving.." !important;
+}
+
+
+@keyframes leaving {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+
+dialog.close {
+  animation: leaving 500ms ease-in-out;
+  animation-fill-mode: forwards;
 }
