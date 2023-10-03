@@ -43,11 +43,12 @@ const Login: React.FC<LoginProps> = (props) => {
 
     return (
         <div className={styles.container}>
+            <h2>Welcome back</h2>
             {loading ? (
                 <Loader />
             ) : (
                 <button className={`btn ${styles.loginButton} `} disabled={loading} onClick={login}>
-                    Login with Google
+                    Continue with Google
                 </button>
             )}
             {/* <button disabled={loading}

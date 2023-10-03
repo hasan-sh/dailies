@@ -7,6 +7,7 @@ import { DEFAULT_CONFIG } from "../../constants";
 export  default function Editor({ data, onReady, onChange, autoSave, language='en', waitingTime=3000 }) {
     const elementsRef = useRef()
     const editorRef = useRef()
+    const savingRef = useRef()
     const [editorLoaded, setEditorLoaded] = useState(false)
     const { CKEditor, CustomEditor, Autosave } = editorRef.current || {}
     const { Main, Editable } = elementsRef.current || {}
@@ -64,6 +65,7 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
 // </><div style={{height: '50%', }}>
 
     return editorLoaded ? <>
+    <dialog ref={savingRef} id="savingDialog">Content Saved</dialog>
     <CKEditor
         id='editor'
         config={{
@@ -72,14 +74,20 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
             autosave: {
                 waitingTime,
                 save: async e => {
+                    // savingRef.current.showModal();
+                    // savingRef.current.className = "close";
                     await autoSave(e.getData())
+                    // setTimeout(() => {
+                    //     savingRef.current.close();
+                    //     savingRef.current.className = "";
+                    // }, 100);
                     displayStatus(e)
                 }
             }
         }}
         editor={CustomEditor}
         data={data}
-
+        
         onReady={editor => {
             const mainEl = editor.ui.view.element
             const editable = editor.ui.view.editable.element
@@ -87,6 +95,7 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
                 Main: mainEl,
                 Editable: editable
             }
+        console.log(savingRef)
             editor.focus()
             onReady(editor)
             // setEditor(editor)
@@ -102,6 +111,6 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
             // setMarkdown(data)
         }}
     />
-    <div id="editor-status" style={{position: 'relative'}} />
+    <div id="editor-status" />
     </> : null
 }

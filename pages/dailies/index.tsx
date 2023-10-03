@@ -1,6 +1,6 @@
 
 import { collection, DocumentData, onSnapshot, query, where, QueryDocumentSnapshot, deleteDoc, doc as Doc  } from 'firebase/firestore';
-import { BsPinFill, BsXCircle } from 'react-icons/bs'
+import { BsPinFill, BsPlusCircle, BsXCircle } from 'react-icons/bs'
 
 import Link from 'next/link';
 import { ChangeEvent, ChangeEventHandler, EventHandler, useContext, useEffect, useReducer, useState } from 'react';
@@ -74,83 +74,117 @@ function Dailies({ date, user }: DailiesProps) {
             className={styles.searchInput}
             onChange={searchHandler}
             value={searchTerm}
-            placeholder="Search.." />
+            placeholder="Search.."
+          />
+
+          <Link
+            href={{
+              pathname: "/dailies/create",
+              query: { uid: user.uid },
+            }}
+            as="/dailies/create"
+            style={{
+              borderColor: "#0070f3",
+              color: "#0070f3",
+            }}
+          >
+            <BsPlusCircle
+              className={`${styles.plus} ${styles.icon}`}
+              color="#0070f3"
+            />
+          </Link>
         </div>
       )}
 
       <AnimateSharedLayout>
         <motion.ul layout className={styles.grid}>
-
-          {dailies && filterRelevant()?.map((doc: DocumentData) => {
-          // {dailies?.map((doc: DocumentData) => {
-            const daily = doc.data()
-            const createdAt = new Date(daily.createdAt.seconds * 1000)
-            let updatedAt: Date;
-            if (daily.updatedAt) {
-              updatedAt = new Date(daily.updatedAt.seconds * 1000)
-            }
-            return <motion.div
-              layout
-              layoutId={doc.id}
-              key={doc.id}
-              onClick={() => {
-                // cuz daily is a proxy!
-                setSelectedDaily({id: doc.id, text: daily.text, language: daily.lang, pinned: daily.pinned, createdAt, updatedAt})
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{
-                staggerChildren: 1
-              }}
-              className={styles.card}
-              style={{textAlign: daily.lang === 'ar' ? 'right' : 'left'}}>
-              <div className={styles.actions}>
-                {daily.pinned && <BsPinFill className={styles.pinned} color='orange'/>}
-                {<BsXCircle 
-                  className={styles.delete} 
-                  color='red' 
-                  onClick={async (e) => {
-                    e.stopPropagation()
-                    const answer = confirm('Delete it?')
-                    if (answer) {
-                      // remove it
-                      const docRef = Doc(db, 'dailies', doc.id)
-                      await deleteDoc(docRef)
-                    }
+          {dailies &&
+            filterRelevant()?.map((doc: DocumentData) => {
+              // {dailies?.map((doc: DocumentData) => {
+              const daily = doc.data();
+              const createdAt = new Date(daily.createdAt.seconds * 1000);
+              let updatedAt: Date;
+              if (daily.updatedAt) {
+                updatedAt = new Date(daily.updatedAt.seconds * 1000);
+              }
+              return (
+                <motion.div
+                  layout
+                  layoutId={doc.id}
+                  key={doc.id}
+                  onClick={() => {
+                    // cuz daily is a proxy!
+                    setSelectedDaily({
+                      id: doc.id,
+                      text: daily.text,
+                      language: daily.lang,
+                      pinned: daily.pinned,
+                      createdAt,
+                      updatedAt,
+                    });
                   }}
-                  />}
-              </div>
-              <Link
-                href="/dailies/my-daily" 
-                // href={{
-                //   pathname: `/dailies/${doc.id}`,
-                //   query: { ...daily, createdAt: createdAt.toDateString(), language: daily.lang },
-                // }}
-                // as={`/dailies/${doc.id}`}
-                key={doc.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{
+                    staggerChildren: 1,
+                  }}
+                  className={styles.card}
+                  style={{ textAlign: daily.lang === "ar" ? "right" : "left" }}
                 >
-
-                <h2>{createdAt.toDateString()} &rarr;</h2>
-                {/* <p>{daily.text}</p> */}
-                {parseHTML(daily.text.substring(0, 100))}
-              </Link>
-            </motion.div>
-          })}
+                  <div className={styles.actions}>
+                    {daily.pinned && (
+                      <BsPinFill className={styles.icon} color="orange" />
+                    )}
+                    {
+                      <BsXCircle
+                        className={styles.icon}
+                        color="red"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          const answer = confirm("Delete it?");
+                          if (answer) {
+                            // remove it
+                            const docRef = Doc(db, "dailies", doc.id);
+                            await deleteDoc(docRef);
+                          }
+                        }}
+                      />
+                    }
+                  </div>
+                  <Link
+                    href="/dailies/my-daily"
+                    // href={{
+                    //   pathname: `/dailies/${doc.id}`,
+                    //   query: { ...daily, createdAt: createdAt.toDateString(), language: daily.lang },
+                    // }}
+                    // as={`/dailies/${doc.id}`}
+                    key={doc.id}
+                  >
+                    <h2>{createdAt.toDateString()} &rarr;</h2>
+                    {/* <p>{daily.text}</p> */}
+                    {parseHTML(daily.text.substring(0, 47) + '...')}
+                  </Link>
+                </motion.div>
+              );
+            })}
         </motion.ul>
       </AnimateSharedLayout>
-      <Link href={{
-        pathname: '/dailies/create',
-        query: { uid: user.uid }
-      }}
-        as='/dailies/create'
-        className={styles.card} style={{
-          borderColor: '#0070f3',
-          color: '#0070f3',
-        }}>
+      <Link
+        href={{
+          pathname: "/dailies/create",
+          query: { uid: user.uid },
+        }}
+        as="/dailies/create"
+        className={styles.card}
+        style={{
+          borderColor: "#0070f3",
+          color: "#0070f3",
+        }}
+      >
         <h2 style={{ margin: 0 }}>Create Daily &rarr;</h2>
       </Link>
     </div>
-  )
+  );
 }
 
 export default observer(Dailies)

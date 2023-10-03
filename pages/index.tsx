@@ -17,6 +17,7 @@ import Login from '../components/login';
 import { DateContext } from '../store/date';
 import Splash from '../components/splash';
 import { DailiesContext } from '../store/dailies';
+import SideMenu from '../components/sideMenu';
 
 
 interface HomeProps {
@@ -57,6 +58,17 @@ export default observer(function Home(props: HomeProps) {
 
         {user ? (
           <>
+            {/* <SideMenu 
+              open={false}
+              content={
+                <>
+                  <button className={`btn ${styles.signOut}`} onClick={async () => {
+                    await signOut(auth)
+                    setUser(props.user)
+                  }}>Sign out</button>
+                </>
+            }/> */}
+            
             <p className={styles.description}>
               <span className={styles.name}>{user.displayName}</span>, Choose a date to see your Dailies
             </p>

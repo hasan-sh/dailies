@@ -27,8 +27,8 @@ const sidebar = {
   }
 };
 
-export default function SideMenu({ content } : { content: React.ReactNode}) {
-  const [isOpen, toggleOpen] = useCycle(true, false);
+export default function SideMenu({ content, open=true } : { content: React.ReactNode, open: Boolean}) {
+  const [isOpen, toggleOpen] = useCycle(open, !open);
   const containerRef = useRef(null);
   const { height } = useDimensions(containerRef);
 
@@ -42,7 +42,7 @@ export default function SideMenu({ content } : { content: React.ReactNode}) {
     >
       {/* <motion.div className={styles.background} variants={sidebar} /> */}
       {/* <Navigation /> */}
-      <div className={styles.content}>
+      <div className={styles.content} style={{display: isOpen ? 'flex' : 'block'}}>
         {isOpen && content}
       </div>
       <MenuToggle toggle={() => toggleOpen()} />
