@@ -95,7 +95,6 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
                 Main: mainEl,
                 Editable: editable
             }
-        console.log(savingRef)
             editor.focus()
             onReady(editor)
             // setEditor(editor)
@@ -107,7 +106,6 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
             const data = editor.getData();
             onChange(data)
             changeLayout()
-            // console.log({ event, editor, data });
             // setMarkdown(data)
         }}
     />

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 
 import dynamic from 'next/dynamic';
 
-import { motion} from "framer-motion"
+import { motion } from "framer-motion"
 
 import styles from './dailies.module.css'
 import { db } from '../../firebase';
@@ -22,11 +22,6 @@ import SideMenu from '../../components/sideMenu';
 
 const Editor = dynamic(() => import('../../components/editor'));
 
-// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-// const ClassicEditor = dynamic(
-//   () => import("@ckeditor/ckeditor5-build-classic").then((mod) => mod.default),
-//   { ssr: false }
-// );
 
 const DailyControl = ({data, onChange}) => {
 
@@ -92,15 +87,12 @@ const Daily = () => {
 
     }, [id])
 
-    console.log(pinned)
     useEffect(() => {
         const autosave = async data => {
             await updateDaily(data, id.toString(), lang, pinned)
         }
 
         if ((newContent && newContent !== text) || lang !== language || pinned !== isPinned) {
-        console.log(newContent !== text, lang !== language, pinned !== isPinned)
-            console.log('auto save', newContent, text)
             autosave(newContent || text)
         }
         
@@ -190,7 +182,7 @@ async function getDaily(id) {
 
 
 async function updateDaily(md, id, lang='en', pinned=false) {
-    console.log('updating ', md, id, lang, pinned)
+    // console.log('updating ', md, id, lang, pinned)
     const docRef = doc(db, 'dailies', id)
 
     await setDoc(docRef, {

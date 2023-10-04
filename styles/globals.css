@@ -50,8 +50,6 @@ a {
 
 
 .ck-editor {
-    height: 50% !important;
-    /* height: 100% !important; */
     display: flex;
     flex-direction: column;
     width: clamp(60%, 100%, 100%) !important;
