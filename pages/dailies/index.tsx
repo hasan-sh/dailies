@@ -68,7 +68,7 @@ function Dailies({ date, user }: DailiesProps) {
         </div>
       )}
       {dailies.length && (
-        <div className={styles.searchContainer}>
+        <div className="flex mt-2 items-center">
           <input
             type="search"
             className={styles.searchInput}
@@ -87,6 +87,7 @@ function Dailies({ date, user }: DailiesProps) {
               borderColor: "#0070f3",
               color: "#0070f3",
             }}
+            className='hover:text-red-200'
           >
             <BsPlusCircle
               className={`${styles.plus} ${styles.icon}`}
