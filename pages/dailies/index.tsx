@@ -68,7 +68,7 @@ function Dailies({ date, user }: DailiesProps) {
         </div>
       )}
       {dailies.length && (
-        <div className="flex mt-2 items-center">
+        <div className="flex mt-2 items-center justify-center w-full">
           <input
             type="search"
             className={styles.searchInput}
@@ -215,7 +215,7 @@ function filterBySearch(docs: QueryDocumentSnapshot<DocumentData>[], term: strin
   return docs.filter(d => {
     const data = d.data()
     const terms = term.trim().split(' ')
-    const exists = terms.some(t => data.text.toLowerCase().includes(t.toLocaleLowerCase()))
+    const exists = terms.every(t => data.text.toLowerCase().includes(t.toLocaleLowerCase()))
     return exists
   })
 }
