@@ -99,6 +99,9 @@ a {
   padding: 5px;
 }
 
+#editor-status.disabled::after {
+  content: "Cannot be edited.";
+}
 .busy::after {
   content: "Saving.." !important;
 }

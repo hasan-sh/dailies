@@ -67,7 +67,7 @@ function Dailies({ date, user }: DailiesProps) {
           <Loader />
         </div>
       )}
-      {dailies.length && (
+      {!!dailies.length && (
         <div className="flex mt-2 items-center justify-center w-full">
           <input
             type="search"
@@ -153,12 +153,12 @@ function Dailies({ date, user }: DailiesProps) {
                     }
                   </div>
                   <Link
-                    href="/dailies/my-daily"
-                    // href={{
-                    //   pathname: `/dailies/${doc.id}`,
-                    //   query: { ...daily, createdAt: createdAt.toDateString(), language: daily.lang },
-                    // }}
-                    // as={`/dailies/${doc.id}`}
+                    // href="/dailies/my-daily"
+                    href={{
+                      pathname: `/dailies/${doc.id}`,
+                      query: { ...daily, createdAt: createdAt.toDateString(), pinned: daily.pinned, language: daily.lang },
+                    }}
+                    as={`/dailies/${doc.id}`}
                     key={doc.id}
                   >
                     <h2>{createdAt.toDateString()} &rarr;</h2>
