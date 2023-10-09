@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { DEFAULT_CONFIG } from "../../constants";
 
-export  default function Editor({ data, onReady, onChange, autoSave, language='en', waitingTime=3000 }) {
+export  default function Editor({ data, onReady, onChange, autoSave, readOnly, language='en', waitingTime=3000 }) {
     const elementsRef = useRef()
     const editorRef = useRef()
     const savingRef = useRef()
@@ -20,7 +20,6 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
         }
         setEditorLoaded(true)
     }, []);
-
 
     function changeLayout(e) {
         if (!Main || !Editable) return
@@ -68,6 +67,7 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
     <dialog ref={savingRef} id="savingDialog">Content Saved</dialog>
     <CKEditor
         id='editor'
+
         config={{
             ...DEFAULT_CONFIG,
             language,
@@ -76,12 +76,12 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
                 save: async e => {
                     // savingRef.current.showModal();
                     // savingRef.current.className = "close";
+                    displayStatus(e)
                     await autoSave(e.getData())
                     // setTimeout(() => {
                     //     savingRef.current.close();
                     //     savingRef.current.className = "";
                     // }, 100);
-                    displayStatus(e)
                 }
             }
         }}
@@ -89,6 +89,14 @@ export  default function Editor({ data, onReady, onChange, autoSave, language='e
         data={data}
         
         onReady={editor => {
+            const statusIndicator = document.querySelector( '#editor-status' );
+            if (readOnly) {
+                editor.enableReadOnlyMode('editor')
+                statusIndicator.classList.add('disabled')
+            } else {
+                editor.disableReadOnlyMode('editor')
+                statusIndicator.classList.remove('disabled')
+            }
             const mainEl = editor.ui.view.element
             const editable = editor.ui.view.editable.element
             elementsRef.current = {
